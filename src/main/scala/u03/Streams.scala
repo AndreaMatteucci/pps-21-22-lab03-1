@@ -1,6 +1,6 @@
 package u03
 
-object Streams extends App:
+object Streams extends App :
 
   import Lists.*
 
@@ -37,7 +37,46 @@ object Streams extends App:
     def iterate[A](init: => A)(next: A => A): Stream[A] =
       cons(init, iterate(next(init))(next))
 
-  // TODO: def drop(....)
+    def drop[A](stream: Stream[A])(n: Int): Stream[A] = (stream, n) match
+      case (Cons(h, t), n) if n > 0 => drop(t())(n - 1)
+      case (Cons(h, t), n) => Cons(h, t)
+      case _ => Empty()
+
+    def constant[A](x: A): Stream[A] =
+      cons(x, constant(x))
+
+
+    def fibs: Stream[Int] =
+      def fib(n: Int): Int = n match
+        case 0 => n
+        case 1 => n + fib(0)
+        case _ => fib(n - 2) + fib(n - 1)
+
+      map(iterate(0)(_ + 1))(fib)
+
+
+
+    /*
+      def fib(n: Int): Int = n match
+      case 0 => n
+      case 1 => n+fib(0)
+      case _ => fib(n-2) + fib(n-1)
+
+      FIBONACCI TAIL
+      def fibTR(num: Int): BigInt = {
+        @scala.annotation.tailrec
+        def fibFcn(n: Int, acc1: BigInt, acc2: BigInt): BigInt = n match {
+          case 0 => acc1
+          case 1 => acc2
+          case _ => fibFcn(n - 1, acc2, acc1 + acc2)
+        }
+
+        fibFcn(num, 0, 1)
+      }
+
+    */
+
+
   end Stream
 
   // var simplifies chaining of functions a bit..
@@ -48,4 +87,4 @@ object Streams extends App:
   println(Stream.toList(str)) // [1,2,21,22,..,28]
 
   val corec: Stream[Int] = Stream.cons(1, corec) // {1,1,1,..}
-  println(Stream.toList(Stream.take(corec)(10))) // [1,1,..,1]
+  println(Stream.toList(Stream.take(corec)(10)))
